@@ -15,16 +15,15 @@ load("subsidy_tracker_scrape_results.RData")
 # get subsidy urls for each state
 # store in container
 state_store <- list()
-for(i in 1:length(res)){
+for(i in seq_along(res)){
   # if state has data in list...
-  if(!is.null(res[[i]])){
-    # unlist urls
-    state_store[[i]] <- unlist(res[[i]]$webpages)
+  if(length(res[[i]]$webpages) > 0){
+  # unlist urls
+  state_store[[i]] <- unlist(res[[i]]$webpages)
   } # if not, do nothing; alaska has no data, throws an annoying null vector
 }
 # unlist all pages from list to get massive vector of urls
 all_pages <- unlist(state_store)
-
 
 # scraping ---------------------------------
 
@@ -65,7 +64,7 @@ get_pages <- function(x){
   )
 }
 # how long does this take to run? it is quick; but elapsed time is long. oh well
-system.time(get_pages(x = mn_store[5]))
+system.time(get_pages(x = all_pages[5]))
 # around 300,000 webpages; each page takes 0.5 seconds (upper bound), so 2 pages per second
 # 150,000 seconds total; (150,000/60)/60 comes out to about 42 hours total runtime if looped
 # even when vectorized, still takes enormous time (but around 30 hours)
@@ -111,7 +110,7 @@ batch1df %>%
   arrange(desc(n))
 
 
-# REPEAT ABOVE FOR NEXT THREE QUARTERS OF URLS
+# REPEAT ABOVE FOR NEXT THREE QUARTERS OF URLs
 
 # ---- batch 2
 batch2 <- all_pages[(floor(length(all_pages)/4)+1):floor(length(all_pages)/2)]

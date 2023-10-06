@@ -124,6 +124,6 @@ for(j in 1:length(states)){
   }
 }
 # save results
-save(res, file = "subsidy_tracker_scrape_results.RData")
+#save(res, file = "subsidy_tracker_scrape_results.RData")
 
 
