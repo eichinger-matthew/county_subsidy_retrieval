@@ -10,8 +10,7 @@ library(rvest)
 library(RSelenium)
 
 # load scraped subsidy data from previous script
-load("subsidy_tracker_scrape_results.RData")
-
+load("C:/Users/eichi/Desktop/subsidy_dataset/web_scraping/subsidy_tracker_scrape_results.RData")
 # get subsidy urls for each state
 # store in container
 state_store <- list()
@@ -109,7 +108,6 @@ batch1df %>%
   count(major_industry_of_parent) %>%
   arrange(desc(n))
 
-
 # REPEAT ABOVE FOR NEXT THREE QUARTERS OF URLs
 
 # ---- batch 2
@@ -188,15 +186,6 @@ save(batch4df, file = "batch4of4_subsidy_characteristics.RData")
 batch4df %>%
   count(major_industry_of_parent) %>%
   arrange(desc(n))
-
-
-
-
-
-
-
-
-
 
 
 

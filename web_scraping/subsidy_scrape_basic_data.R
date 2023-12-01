@@ -16,7 +16,7 @@ states <- tigris::fips_codes %>%
 
 # make results container
 res <- list()
-# loop over states
+# loop over state index
 for(i in 1:length(states)){
   # prepare list object for each state
   # sublists for a dataset of info and webpages for more info on subsidies
@@ -66,13 +66,16 @@ for(j in 1:length(states)){
     
   } else{ # if num entires more than 30, find last page num
     # go to last arrow thing on page
-    remDr$findElement(using = "xpath", '//*[@id="contentResult"]/div/div[2]/ul/li[12]')$clickElement()
+    remDr$findElement(
+      using = "xpath", 
+      '//*[@id="contentResult"]/div/div[2]/ul/li[12]')$clickElement()
   
     # pause to give system time
     Sys.sleep(2)
   
     # get last page
-    final_num <- remDr$findElement(using = "xpath", '//*[@id="contentResult"]/div/div[2]/ul/li[12]')
+    final_num <- remDr$findElement(
+      using = "xpath", '//*[@id="contentResult"]/div/div[2]/ul/li[12]')
     num_pages <- unlist(final_num$getElementText())
     # print number of pages as a check on progress
     print(num_pages)
@@ -105,7 +108,7 @@ for(j in 1:length(states)){
       info %>%
       html_table() %>%
       .[[2]]
-    # print to see it is running
+    # print to verify it is running
     print(tab)
     # get urls
     urls <- info %>% 

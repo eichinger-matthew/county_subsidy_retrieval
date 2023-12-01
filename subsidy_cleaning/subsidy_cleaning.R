@@ -10,6 +10,7 @@
 library(janitor)
 library(tidyverse)
 library(tigris)
+library(fuzzyjoin)
 setwd("C:/Users/eichi/Desktop/subsidy_dataset/subsidy_cleaning")
 
 # load batch data
@@ -27,6 +28,13 @@ batch3df <- batch3df %>% select(order(colnames(.)))
 batch4df <- batch4df %>% select(order(colnames(.)))
 # bind batch info and get rid of duplicates
 df <- rbind(batch1df, batch2df, batch3df, batch4df) %>% distinct()
+# employment data for all naics
+emp <- read_csv("C:/Users/eichi/Desktop/favorable_subsidies/employment/county_employment_sixd_naics_2002.csv")
+# save in case people want to use it
+#write_csv(emp, file = "all_subsidy_cases_including_uncleaned.csv")
+
+
+
 
 # get unique county names
 unique(df$county)
@@ -82,7 +90,7 @@ df_clean <-
          naics = str_trim(naics)) %>%
   select(case, year, city, company, county, location, major_industry_of_parent,
          specific_industry_of_parent, naics, subsidy_value, subsidy_undisclosed,
-         type_of_subsidy, wage_data, wage_data_type, number_of_jobs_or_training_slots, 
+         type_of_subsidy, subsidy_source, wage_data, wage_data_type, number_of_jobs_or_training_slots, 
          project_description) %>%
   left_join(fips_codes, by = c('location' = 'state_name', 'county')) %>%
   mutate(fips = str_c(state_code, county_code))
@@ -120,6 +128,7 @@ for(i in 1:nrow(g)){
                    naics = j,
                    major_industry_of_parent = g$major_industry_of_parent[i],
                    specific_industry_of_parent = g$specific_industry_of_parent[i],
+                   subsidy_source = g$subsidy_source[i],
                    wage_data = g$wage_data[i],
                    wage_data_type = g$wage_data_type[i],
                    number_of_jobs_or_training_slots = g$number_of_jobs_or_training_slots[i],
@@ -192,6 +201,7 @@ for(i in 1:nrow(h)){
                    naics = h$naics[j],
                    major_industry_of_parent = h$major_industry_of_parent[i],
                    specific_industry_of_parent = h$specific_industry_of_parent[i],
+                   subsidy_source = h$subsidy_source[i],
                    wage_data = h$wage_data[i],
                    wage_data_type = h$wage_data_type[i],
                    number_of_jobs_or_training_slots = h$number_of_jobs_or_training_slots[i]) %>%
@@ -216,7 +226,6 @@ df_naics_counties_clean <-
 
 
 # fuzzy string match --------------------
-
 
 # from complete data, filter observations with no fips info
 # use fuzzy string matching (lv - levenshtein distance) to see if the county can be idenfitied with (fips_codes)
@@ -243,10 +252,11 @@ fuzzy_finishes <-
 master_df <-
   df_naics_counties_clean %>%
   left_join(fuzzy_finishes) %>%
-  filter(!is.na(fips))
+  filter(!is.na(fips)) %>%
+  select(case:location, state:fips, everything())
+#write_csv(master_df, file = "all_subsidies_after_2000.csv")
 
 # naics -----------------------------
-
 # total subsidies by county-naics
 # remove na values on fips to avoid later merging headaches
 countysubs_by_naics <-
